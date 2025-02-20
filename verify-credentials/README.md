@@ -119,19 +119,19 @@ Required parameters:
 
 ## Error Codes
 
-| Code | Description |
-|------|-------------|
-| u100 | Unauthorized access |
-| u101 | Institution already exists |
-| u102 | Institution or credential not found |
-| u103 | Credential type not supported |
-| u104 | Credential revoked |
-| u105 | Credential expired |
-| u106 | Invalid input parameters |
-| u107 | Invalid zero address |
-| u108 | Invalid validity period |
-| u109 | Credential already exists |
-| u110 | Invalid document hash |
+| Code | Constant | Description |
+|------|----------|-------------|
+| u100 | ERR_UNAUTHORIZED_ACCESS | Unauthorized access |
+| u101 | ERR_INSTITUTION_ALREADY_EXISTS | Institution already exists |
+| u102 | ERR_INSTITUTION_OR_CREDENTIAL_NOT_FOUND | Institution or credential not found |
+| u103 | ERR_CREDENTIAL_TYPE_NOT_SUPPORTED | Credential type not supported |
+| u104 | ERR_CREDENTIAL_REVOKED | Credential revoked |
+| u105 | ERR_CREDENTIAL_EXPIRED | Credential expired |
+| u106 | ERR_INVALID_INPUT_PARAMETERS | Invalid input parameters |
+| u107 | ERR_INVALID_ZERO_ADDRESS | Invalid zero address |
+| u108 | ERR_INVALID_VALIDITY_PERIOD | Invalid validity period |
+| u109 | ERR_CREDENTIAL_ALREADY_EXISTS | Credential already exists |
+| u110 | ERR_INVALID_DOCUMENT_HASH | Invalid document hash |
 
 ## Security Features
 

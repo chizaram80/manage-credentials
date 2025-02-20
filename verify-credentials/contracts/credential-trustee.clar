@@ -1,17 +1,17 @@
 ;; Credential Verification Smart Contract
 
 ;; Error codes
-(define-constant ERROR-UNAUTHORIZED-ACCESS (err u100))
-(define-constant ERROR-INSTITUTION-ALREADY-EXISTS (err u101))
-(define-constant ERROR-INSTITUTION-OR-CREDENTIAL-NOT-FOUND (err u102))
-(define-constant ERROR-CREDENTIAL-TYPE-NOT-SUPPORTED (err u103))
-(define-constant ERROR-CREDENTIAL-REVOKED (err u104))
-(define-constant ERROR-CREDENTIAL-EXPIRED (err u105))
-(define-constant ERROR-INVALID-INPUT-PARAMETERS (err u106))
-(define-constant ERROR-INVALID-ZERO-ADDRESS (err u107))
-(define-constant ERROR-INVALID-VALIDITY-PERIOD (err u108))
-(define-constant ERROR-CREDENTIAL-ALREADY-EXISTS (err u109))
-(define-constant ERROR-INVALID-DOCUMENT-HASH (err u110))
+(define-constant ERR_UNAUTHORIZED_ACCESS (err u100))
+(define-constant ERR_INSTITUTION_ALREADY_EXISTS (err u101))
+(define-constant ERR_INSTITUTION_OR_CREDENTIAL_NOT_FOUND (err u102))
+(define-constant ERR_CREDENTIAL_TYPE_NOT_SUPPORTED (err u103))
+(define-constant ERR_CREDENTIAL_REVOKED (err u104))
+(define-constant ERR_CREDENTIAL_EXPIRED (err u105))
+(define-constant ERR_INVALID_INPUT_PARAMETERS (err u106))
+(define-constant ERR_INVALID_ZERO_ADDRESS (err u107))
+(define-constant ERR_INVALID_VALIDITY_PERIOD (err u108))
+(define-constant ERR_CREDENTIAL_ALREADY_EXISTS (err u109))
+(define-constant ERR_INVALID_DOCUMENT_HASH (err u110))
 
 ;; Data maps
 (define-map registered-education-institutions 
@@ -72,8 +72,8 @@
 ;; Public functions
 (define-public (transfer-contract-ownership (new-administrator-address principal))
     (begin
-        (asserts! (is-eq tx-sender (var-get contract-administrator)) ERROR-UNAUTHORIZED-ACCESS)
-        (asserts! (is-valid-blockchain-address new-administrator-address) ERROR-INVALID-ZERO-ADDRESS)
+        (asserts! (is-eq tx-sender (var-get contract-administrator)) ERR_UNAUTHORIZED_ACCESS)
+        (asserts! (is-valid-blockchain-address new-administrator-address) ERR_INVALID_ZERO_ADDRESS)
         (ok (var-set contract-administrator new-administrator-address))
     )
 )
@@ -89,18 +89,18 @@
             institution-is-verified: false
         })
     )
-        (asserts! (is-valid-text-input institution-name) ERROR-INVALID-INPUT-PARAMETERS)
-        (asserts! (is-valid-text-input institution-website) ERROR-INVALID-INPUT-PARAMETERS)
-        (asserts! (is-none (map-get? registered-education-institutions tx-sender)) ERROR-INSTITUTION-ALREADY-EXISTS)
+        (asserts! (is-valid-text-input institution-name) ERR_INVALID_INPUT_PARAMETERS)
+        (asserts! (is-valid-text-input institution-website) ERR_INVALID_INPUT_PARAMETERS)
+        (asserts! (is-none (map-get? registered-education-institutions tx-sender)) ERR_INSTITUTION_ALREADY_EXISTS)
         (ok (map-set registered-education-institutions tx-sender institution-details))
     )
 )
 
 (define-public (verify-institution-status (institution-address principal))
     (begin
-        (asserts! (is-eq tx-sender (var-get contract-administrator)) ERROR-UNAUTHORIZED-ACCESS)
-        (asserts! (is-valid-blockchain-address institution-address) ERROR-INVALID-ZERO-ADDRESS)
-        (asserts! (is-some (map-get? registered-education-institutions institution-address)) ERROR-INSTITUTION-OR-CREDENTIAL-NOT-FOUND)
+        (asserts! (is-eq tx-sender (var-get contract-administrator)) ERR_UNAUTHORIZED_ACCESS)
+        (asserts! (is-valid-blockchain-address institution-address) ERR_INVALID_ZERO_ADDRESS)
+        (asserts! (is-some (map-get? registered-education-institutions institution-address)) ERR_INSTITUTION_OR_CREDENTIAL_NOT_FOUND)
         (ok (map-set registered-education-institutions 
             institution-address 
             (merge (unwrap-panic (map-get? registered-education-institutions institution-address)) 
@@ -116,10 +116,10 @@
     (validity-duration-blocks uint)
 )
     (begin
-        (asserts! (is-eq tx-sender (var-get contract-administrator)) ERROR-UNAUTHORIZED-ACCESS)
-        (asserts! (is-valid-text-input type-id) ERROR-INVALID-INPUT-PARAMETERS)
-        (asserts! (is-valid-text-input type-description) ERROR-INVALID-INPUT-PARAMETERS)
-        (asserts! (is-valid-duration-period validity-duration-blocks) ERROR-INVALID-VALIDITY-PERIOD)
+        (asserts! (is-eq tx-sender (var-get contract-administrator)) ERR_UNAUTHORIZED_ACCESS)
+        (asserts! (is-valid-text-input type-id) ERR_INVALID_INPUT_PARAMETERS)
+        (asserts! (is-valid-text-input type-description) ERR_INVALID_INPUT_PARAMETERS)
+        (asserts! (is-valid-duration-period validity-duration-blocks) ERR_INVALID_VALIDITY_PERIOD)
         (ok (map-set valid-credential-types type-id {
             type-description: type-description,
             validity-duration-blocks: validity-duration-blocks
@@ -135,21 +135,21 @@
     (credential-metadata (string-ascii 256))
 )
     (let (
-        (institution-details (unwrap! (map-get? registered-education-institutions tx-sender) ERROR-INSTITUTION-OR-CREDENTIAL-NOT-FOUND))
-        (credential-type-details (unwrap! (map-get? valid-credential-types credential-type) ERROR-CREDENTIAL-TYPE-NOT-SUPPORTED))
+        (institution-details (unwrap! (map-get? registered-education-institutions tx-sender) ERR_INSTITUTION_OR_CREDENTIAL_NOT_FOUND))
+        (credential-type-details (unwrap! (map-get? valid-credential-types credential-type) ERR_CREDENTIAL_TYPE_NOT_SUPPORTED))
         (current-block-timestamp block-height)
         (expiration-timestamp (+ current-block-timestamp (get validity-duration-blocks credential-type-details)))
     )
-        (asserts! (is-valid-text-input credential-id) ERROR-INVALID-INPUT-PARAMETERS)
-        (asserts! (is-valid-blockchain-address recipient-address) ERROR-INVALID-ZERO-ADDRESS)
-        (asserts! (is-valid-text-input credential-type) ERROR-INVALID-INPUT-PARAMETERS)
-        (asserts! (is-valid-text-input credential-metadata) ERROR-INVALID-INPUT-PARAMETERS)
-        (asserts! (is-valid-document-hash credential-content-hash) ERROR-INVALID-DOCUMENT-HASH)
-        (asserts! (get institution-is-verified institution-details) ERROR-UNAUTHORIZED-ACCESS)
+        (asserts! (is-valid-text-input credential-id) ERR_INVALID_INPUT_PARAMETERS)
+        (asserts! (is-valid-blockchain-address recipient-address) ERR_INVALID_ZERO_ADDRESS)
+        (asserts! (is-valid-text-input credential-type) ERR_INVALID_INPUT_PARAMETERS)
+        (asserts! (is-valid-text-input credential-metadata) ERR_INVALID_INPUT_PARAMETERS)
+        (asserts! (is-valid-document-hash credential-content-hash) ERR_INVALID_DOCUMENT_HASH)
+        (asserts! (get institution-is-verified institution-details) ERR_UNAUTHORIZED_ACCESS)
         (asserts! (is-none (map-get? issued-credentials {
             credential-id: credential-id, 
             recipient-address: recipient-address
-        })) ERROR-CREDENTIAL-ALREADY-EXISTS)
+        })) ERR_CREDENTIAL_ALREADY_EXISTS)
         
         (ok (map-set issued-credentials 
             {credential-id: credential-id, recipient-address: recipient-address}
@@ -175,12 +175,12 @@
             (map-get? issued-credentials 
                 {credential-id: credential-id, recipient-address: recipient-address}
             ) 
-            ERROR-INSTITUTION-OR-CREDENTIAL-NOT-FOUND
+            ERR_INSTITUTION_OR_CREDENTIAL_NOT_FOUND
         ))
     )
-        (asserts! (is-valid-text-input credential-id) ERROR-INVALID-INPUT-PARAMETERS)
-        (asserts! (is-valid-blockchain-address recipient-address) ERROR-INVALID-ZERO-ADDRESS)
-        (asserts! (is-eq tx-sender (get issuing-institution-address credential-details)) ERROR-UNAUTHORIZED-ACCESS)
+        (asserts! (is-valid-text-input credential-id) ERR_INVALID_INPUT_PARAMETERS)
+        (asserts! (is-valid-blockchain-address recipient-address) ERR_INVALID_ZERO_ADDRESS)
+        (asserts! (is-eq tx-sender (get issuing-institution-address credential-details)) ERR_UNAUTHORIZED_ACCESS)
         (ok (map-set issued-credentials 
             {credential-id: credential-id, recipient-address: recipient-address}
             (merge credential-details {is-revoked: true})
@@ -210,13 +210,13 @@
             (is-expired (> current-block-timestamp (get expiration-timestamp-block credential-details)))
         )
             (if (get is-revoked credential-details)
-                ERROR-CREDENTIAL-REVOKED
+                ERR_CREDENTIAL_REVOKED
                 (if is-expired
-                    ERROR-CREDENTIAL-EXPIRED
+                    ERR_CREDENTIAL_EXPIRED
                     (ok true)
                 )
             ))
-        ERROR-INSTITUTION-OR-CREDENTIAL-NOT-FOUND
+        ERR_INSTITUTION_OR_CREDENTIAL_NOT_FOUND
     )
 )
 
